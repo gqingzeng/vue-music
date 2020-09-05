@@ -1,0 +1,83 @@
+body {
+  line-height: 1.5;
+  font-size: 14px;
+  font-family: 'PingFang SC','PingFangSC-Regular', 'microsoft yahei', 'helvetica neue', tahoma, arial, 'hiragino sans gb', sans-serif;
+}
+
+html,
+body,
+div,
+span,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+pre,
+a,
+img,
+small,
+strong,
+sub,
+sup,
+tt,
+dl,
+dt,
+dd,
+ol,
+ul,
+li,
+form,
+label,
+table,
+caption,
+tbody,
+tfoot,
+thead,
+tr,
+th,
+td {
+  margin: 0;
+  padding: 0;
+}
+
+button,
+input,
+select,
+textarea {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: 0;
+}
+
+a,a:hover,a:active,a:visited,a:link,a:focus{
+  outline:none;
+  background: none;
+  text-decoration: none;
+  color:#000; 
+}
+
+img {
+  border: 0;
+  vertical-align: bottom;
+}
+ul,
+li {
+  list-style: none;
+}
+
+/* 清除浮动 */
+.clearfix:after,.clearfix:before{
+  content: "";
+  display: table;
+}
+.clearfix:after{
+  clear: both;
+  overflow: hidden;
+}
+.clearfix{
+  *zoom: 1;
+}
