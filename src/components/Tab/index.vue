@@ -31,9 +31,6 @@ export default {
   },
   mounted() {
     this.initTabLine();
-    window.addEventListener("resize", () => {
-      this.initTabLine();
-    });
   },
   methods: {
     // 点击tab
@@ -44,6 +41,8 @@ export default {
           path: item.path,
         });
       }
+      console.log(this.$route.path);
+
     },
     // 初始化tab下划线的宽度和水平偏移量
     initTabLine() {
@@ -57,6 +56,14 @@ export default {
         tabSize.push(size);
       });
       this.tabSize = tabSize;
+      this.getCurrentIndex();
+    },
+    getCurrentIndex() {
+      this.tabItems.forEach((item, index) => {
+        if (item.path === this.$route.path) {
+          this.tabIndex = index;
+        }
+      });
     },
   },
 };

@@ -67,8 +67,6 @@ export default {
         child.style.width = swiperWidth + "px";
         width += swiperWidth;
       }
-      console.log(width);
-      console.log(this.children.length);
       this.$refs.swiperContent.style.width = width + "px";
     },
     // 滚动初始化
