@@ -109,12 +109,10 @@ export default {
       lis.forEach((item) => {
         this.rightHeight.push(item.offsetTop);
       });
-      // console.log( this.rightHeight);
     },
     shortcutTouchStart(e) {
       let anchorIndex = e.target.getAttribute("data-index");
       this.scrollY = -this.rightHeight[anchorIndex];
-      // console.log(anchorIndex);
       this.MyScrollTo(anchorIndex);
     },
     MyScrollTo(index) {
@@ -128,7 +126,6 @@ export default {
     },
     scroll(pos) {
       this.scrollY = pos.y;
-      // console.log("scrollY" + this.scrollY);
     },
     slectItem(item) {
       this.$emit("selectItem", item);

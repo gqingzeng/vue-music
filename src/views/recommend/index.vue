@@ -54,16 +54,13 @@ export default {
     this.getPlaylist();
     this.getBanner();
   },
-  mounted() {},
   methods: {
     async getPlaylist() {
       let res = await getPlaylist();
-      console.log(res.playlists);
       if (res.code === 200) {
         this.discList = res.playlists;
         }
-      }
-    },
+      },
     async getBanner() {
       let res = await getBanner();
       if (res.code === 200) {
@@ -80,6 +77,7 @@ export default {
       }
     }
   }
+}
 
 </script>
 

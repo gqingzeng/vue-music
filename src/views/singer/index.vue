@@ -1,6 +1,6 @@
 <template>
-  <div class="container">
-    <list-view :singerList="singers"></list-view>
+  <div class="singer">
+    <list-view :singerList="singers" @selectItem = "selectSingerItem"></list-view>
   </div>
 </template>
 
@@ -100,6 +100,9 @@ export default {
       console.log(obj);
       return hot.concat(ret);
     },
+    selectSingerItem(item){
+      console.log(item);
+    }
   },
 };
 </script>
