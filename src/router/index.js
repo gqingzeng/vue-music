@@ -29,6 +29,10 @@ const routes = [
         component:()=>import('@/views/search/index.vue')
       }
     ]
+  },{
+    path:'/musicList',
+    name:'musicList',
+    component: () =>import('@/views/singer-list/index.vue'),
   }
 ]
 
