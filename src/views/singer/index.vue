@@ -14,17 +14,7 @@ export default {
   },
   data() {
     return {
-      singers: [
-        {
-          title: "热门",
-          items: [
-            {
-              picUrl: "",
-              name: "薛之谦",
-            },
-          ],
-        },
-      ],
+      singers: [],
     };
   },
   created() {
@@ -33,16 +23,37 @@ export default {
   methods: {
     async getSingers() {
       let res = await getSingers();
-      let singerGroup = res.artists;
-      // 新增首字母到数组中
-      singerGroup.map((item) => {
-        let letter = pinyin(item.name[0], {
-          style: pinyin.STYLE_FIRST_LETTER,
+      if (res.code === 200) {
+        let singerGroup = res.artists;
+        // 新增首字母到数组中
+        singerGroup.map((item) => {
+          let letter = pinyin(item.name[0], {
+            style: pinyin.STYLE_FIRST_LETTER,
+          });
+          item.initials = letter[0][0].toUpperCase();
         });
-        item.initials = letter[0][0].toUpperCase();
-      });
-
-      this.singers = this.normalSinger(singerGroup);
+        this.singers = this.normalSinger(singerGroup);
+        // this.singers[23].items.push(
+        //   {
+        //     id: 1030001,
+        //     name: "周深",
+        //     picUrl:
+        //       "https://p1.music.126.net/ddFj3yFd0VifrxbenUL4kA==/109951165048013094.jpg",
+        //   },
+        //   {
+        //     id: 1030001,
+        //     name: "周深",
+        //     picUrl:
+        //       "https://p1.music.126.net/ddFj3yFd0VifrxbenUL4kA==/109951165048013094.jpg",
+        //   },
+        //   {
+        //     id: 1030001,
+        //     name: "周深",
+        //     picUrl:
+        //       "https://p1.music.126.net/ddFj3yFd0VifrxbenUL4kA==/109951165048013094.jpg",
+        //   }
+        // );
+     }
     },
     normalSinger(list) {
       let obj = {

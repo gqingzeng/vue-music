@@ -16,7 +16,7 @@
           <ul class="list">
             <li class="item" @click="selectItem(item)" v-for="item in discList" :key="item.id">
               <div class="icon">
-                <img class="icon-left" :src="item.coverImgUrl" />
+                <img class="icon-left" v-lazy="item.coverImgUrl" />
               </div>
               <div class="music-content">
                 <h2 class="name">{{item.name}}</h2>
@@ -58,14 +58,14 @@ export default {
   methods: {
     async getPlaylist() {
       let res = await getPlaylist();
-      // console.log(res);
+      console.log(res.playlists);
       if (res.code === 200) {
         this.discList = res.playlists;
+        }
       }
     },
     async getBanner() {
       let res = await getBanner();
-      // console.log(res);
       if (res.code === 200) {
         this.swiperList = res.banners;
       }
@@ -78,9 +78,9 @@ export default {
         this.checkloaded = true;
         this.$refs.scroll.refresh();
       }
-    },
-  },
-};
+    }
+  }
+
 </script>
 
 <style scoped lang="scss">
