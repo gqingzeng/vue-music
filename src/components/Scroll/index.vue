@@ -26,7 +26,9 @@ export default {
     },
   },
   data() {
-    return {};
+    return {
+      scroll:null
+    };
   },
   watch: {
     data() {
@@ -58,19 +60,19 @@ export default {
       }
     },
     disable() {
-      this.scroll && this.scroll.disable();
+      this.scroll.disable();
     },
     enable() {
-      this.scroll && this.scroll.enable();
+      this.scroll.enable();
     },
     refresh() {
-      this.scroll && this.scroll.refresh();
+      this.scroll.refresh();
     },
-    scrollTo(){
-      this.scroll && this.scroll.scrollTo.apply(this.scroll,arguments)
+    scrollTo(...arg){
+      this.scroll.scrollTo(...arg)
     },
-    scrollToElement(){
-      this.scroll && this.scroll.scrollToElement.apply(this.scroll,arguments)
+    scrollToElement(...arg){
+      this.scroll.scrollToElement(...arg)
     }
   },
 };
