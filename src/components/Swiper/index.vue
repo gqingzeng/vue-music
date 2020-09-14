@@ -3,7 +3,7 @@
     <div class="swiper-content" ref="swiperContent">
       <slot></slot>
     </div>
-    <div class="dots">
+    <div class="dots" v-if="showDots">
       <span
         class="dot"
         :class="{active:currentPageIndex === index}"
@@ -36,9 +36,14 @@ export default {
       type: Number,
       default: 4000,
     },
+    showDots: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
+      swiper:null,
       children: [],
       dotsLength: 0,
       currentPageIndex: 0,
@@ -49,9 +54,6 @@ export default {
       this.setSwiperWidth();
       this.initDots();
       this.initScroll();
-    });
-    window.addEventListener("resize", () => {
-      this.swiper.refresh();
     });
   },
   beforeDestroy() {
@@ -71,9 +73,6 @@ export default {
     },
     // 滚动初始化
     initScroll() {
-      if (this.swiper) {
-        return;
-      }
       this.swiper = new BScroll(this.$refs.swiper, {
         probeType: 2,
         click: this.click,
@@ -83,7 +82,7 @@ export default {
         bounce: false,
         useTransition: true,
         stopPropagation: true,
-        tap:true,
+        tap: true,
         slide: {
           loop: this.loop,
           autoplay: this.autoPlay,
