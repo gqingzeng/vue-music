@@ -3,7 +3,7 @@
     <scroll ref="scroll" class="recommend-container" :data="discList">
       <div class="recommend-content">
         <div v-if="swiperList.length">
-          <swiper>
+          <swiper :show-dots="true">
             <div v-for="(swiperItem,index) in swiperList" :key="index">
               <a :href="swiperItem.url">
                 <img class="needsclick" :src="swiperItem.imageUrl" @load="imgLoad" />
@@ -39,6 +39,7 @@ import Swiper from "@/components/Swiper/index";
 import Scroll from "@/components/Scroll/index";
 import Loading from "@/components/Loading/index";
 export default {
+  name:"recommend",
   components: {
     Swiper,
     Scroll,
@@ -59,8 +60,8 @@ export default {
       let res = await getPlaylist();
       if (res.code === 200) {
         this.discList = res.playlists;
-        }
-      },
+      }
+    },
     async getBanner() {
       let res = await getBanner();
       if (res.code === 200) {
@@ -75,10 +76,9 @@ export default {
         this.checkloaded = true;
         this.$refs.scroll.refresh();
       }
-    }
-  }
-}
-
+    },
+  },
+};
 </script>
 
 <style scoped lang="scss">

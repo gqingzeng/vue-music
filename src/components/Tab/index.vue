@@ -11,6 +11,7 @@
 
 <script>
 export default {
+  name:"Tab",
   props: {
     tabItems: {
       type: Array,

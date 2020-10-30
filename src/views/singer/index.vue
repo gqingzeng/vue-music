@@ -1,14 +1,17 @@
 <template>
   <div class="singer">
-    <list-view :singerList="singers" @selectItem = "selectSingerItem"></list-view>
+    <list-view :singerList="singers" @selectItem="selectSingerItem"></list-view>
   </div>
 </template>
 
 <script>
 import ListView from "./components/ListView";
 import { getSingers } from "@/api/singer";
+import {SETSINGER} from '@/store/mutationType.js'
+
 const pinyin = require("pinyin");
 export default {
+  name:"singer",
   components: {
     ListView,
   },
@@ -53,7 +56,7 @@ export default {
         //       "https://p1.music.126.net/ddFj3yFd0VifrxbenUL4kA==/109951165048013094.jpg",
         //   }
         // );
-     }
+      }
     },
     normalSinger(list) {
       let obj = {
@@ -97,12 +100,20 @@ export default {
       ret.sort((a, b) => {
         return a.title.localeCompare(b.title);
       });
-      console.log(obj);
+      // console.log(obj);
       return hot.concat(ret);
     },
-    selectSingerItem(item){
-      console.log(item);
-    }
+    selectSingerItem(item) {
+      // console.log(item);
+      this.$router.push({
+        path: "/musicList",
+        query: {
+          id: item.id,
+        },
+      });
+      // 把值存储在veux的singer中
+      this.$store.commit(SETSINGER,item)
+    },
   },
 };
 </script>

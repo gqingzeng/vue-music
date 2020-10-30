@@ -1,39 +1,39 @@
 <template>
-  <div class="singer-list">
+  <div class="container">
     <music-list :musicList = "musicList" ></music-list>
   </div>
 </template>
 
 <script>
-import { getArtists } from '@/api/singer'
 import MusicList from "../components/MusicList";
 
+import {getSongList} from '@/api/rank'
 export default {
-  name:"singerList",
+  name:"rankList",
   components: {
     MusicList,
   },
-  data() {
-    return {
-      id:this.$route.query.id,
-      musicList: [],
-    };
+  data(){
+   return {
+     id:"",
+     musicList:[]
+   }
   },
   created(){
-    this.getArtists()
+    this.id = this.$route.query.id;
+    console.log(this.id);
+    this._getSongList()
   },
   methods:{
-    async getArtists(){
-      let res = await getArtists({
+   async _getSongList(){
+      const res = await getSongList({
         id:this.id
-      });
-      if(res.code === 200){
-        console.log(res.hotSongs);
-        this.musicList = this.normalData(res.hotSongs)
-      }
+      })
+      this.musicList = this.handleData(res.playlist.tracks)
+      console.log(res);
     },
-    normalData(data){
-      let arr = []
+    handleData(data){
+      const arr = [];
       data.forEach((item) => {
         arr.push({
           songName:item.name
@@ -42,8 +42,9 @@ export default {
       return arr
     }
   }
-};
+}
 </script>
 
 <style scoped lang="scss">
+
 </style>

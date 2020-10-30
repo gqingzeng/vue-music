@@ -1,17 +1,20 @@
 <template>
   <div id="main">
-    <m-header></m-header>
-    <tab :tabItems="tabItems" :value-key="name"></tab>
-    <router-view />
+    <MyHeader />
+    <Tab :tabItems="tabItems" :value-key="name" />
+    <keep-alive>
+      <router-view />
+    </keep-alive>
   </div>
 </template>
 
 <script>
-import MHeader from "@/views/header/index";
+import MyHeader from "@/views/header/index";
 import Tab from "@/components/Tab/index";
 export default {
+  name:"main",
   components: {
-    MHeader,
+    MyHeader,
     Tab,
   },
   data() {

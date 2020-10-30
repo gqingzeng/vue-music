@@ -1,12 +1,13 @@
 <template>
   <div class="header-container">
     <h1 class="title">VMusic</h1>
-    <img class="icon-mine" src="@/assets/img/icon-mine.png"/>
+    <img class="icon-mine" src="@/assets/img/icon-mine.png" />
   </div>
 </template>
 
 <script>
 export default {
+  name:"header",
   data() {
     return {};
   },

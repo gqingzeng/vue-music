@@ -46,6 +46,7 @@
 import Scroll from "@/components/Scroll";
 import Loading from "@/components/Loading";
 export default {
+  name:"ListView",
   components: {
     Scroll,
     Loading,
@@ -78,7 +79,7 @@ export default {
       for (let i = 0; i < height.length - 1; i++) {
         if (-newVal >= height[i] && -newVal < height[i + 1]) {
           this.currentIndex = i;
-          console.log(this.currentIndex, "---");
+          // console.log(this.currentIndex, "---");
           return;
         }
       }
