@@ -1,8 +1,8 @@
 # 技术栈
-* vue+vue-router(核心框架)
-* better-scroll(移动端滑动更加流畅)
-* pinyin(用于数据整合)
-* axios(数据请求)
+* js、css、es6
+* vue+vue-router
+* better-scroll
+* axios
 
 # vue-music
 
