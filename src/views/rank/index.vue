@@ -30,7 +30,6 @@
 <script>
 
 import { getRankList } from "@/api/rank";
-import { SETSINGER } from '@/store/mutationType'
 // import {getRankList, getSongList} from '@/api/rank'
 
 export default {
@@ -50,12 +49,14 @@ export default {
     enterClick(item) {
       console.log(item);
       this.$router.push({
-        path: "/rankList",
+        path: "/rankDetail",
         query: {
           id: item.id,
+          name:item.name,
+          picUrl:item.coverImgUrl
         },
       });
-      this.$store.commit(SETSINGER,item.tracks)
+    
     },
 
     //  async _getRankList(){

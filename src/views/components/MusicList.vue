@@ -1,8 +1,8 @@
 <template>
   <div class="music-list">
     <div class="music-list-top">
-      <img @click="back" class="icon-back" src="@/assets/img/back.png" alt />
-      <h2 class="title">{{singer.name}}</h2>
+      <i class="iconfont icon-zuojiantou" @click="back"></i>
+      <h2 class="title">{{ title }}</h2>
     </div>
 
     <div class="music-list-image" :style="bgStyle" ref="bgImage">
@@ -15,18 +15,19 @@
 
     <div class="song-list-wrapper">
       <scroll class="song-list" :data="musicList" ref="songList">
-        <song-list :songList="musicList"></song-list>
+        <SongList :songList="musicList" @selectSong="selectSong" />
       </scroll>
     </div>
   </div>
 </template>
 
 <script>
-import { mapGetters } from "vuex";
 import SongList from "views/components/SongList";
 import Scroll from "@/components/Scroll";
+import { mapActions } from "vuex";
+
 export default {
-  name:"MusicList",
+  name: "MusicList",
   components: {
     SongList,
     Scroll,
@@ -37,27 +38,31 @@ export default {
     },
   },
   data() {
-    return {};
+    return {
+      title: this.$route.query.name,
+      picUrl: this.$route.query.picUrl,
+    };
   },
   computed: {
     bgStyle() {
-      if(this.singer.picUrl){
-        return `background-image:url(${this.singer.picUrl})`
-      }else{
-        return `background-image:url(${this.singer.coverImgUrl})`
-      }
+      return `background-image:url(${this.picUrl})`;
     },
-    ...mapGetters(["singer"]),
-  },
-  created() {},
-  mounted() {
-
   },
   methods: {
+    // 歌曲列表项
+    selectSong(item, index) {
+      this.setectPlay({
+        list: this.musicList,
+        index,
+      });
+      console.log(item);
+      console.log(index);
+    },
     back() {
       this.$router.go(-1);
     },
     randomPlay() {},
+    ...mapActions(["setectPlay"]),
   },
 };
 </script>
@@ -83,15 +88,22 @@ export default {
   height: 40px;
   width: 100%;
 
-  .icon-back {
-    width: 22px;
-    height: 22px;
-    padding-left: 10px;
+  .icon-zuojiantou {
+    position:relative;
+    top:50%;
+    left: 10px;
+    transform: translateY(-50%);
+    font-size: 24px;
+    color: #ffcd32;
+    z-index: 9;
   }
   .title {
     position: absolute;
     left: 50%;
+    top: 20%;
     transform: translateX(-50%);
+    width: 50%;
+    text-align: center;
     font-size: 18px;
     color: #fff;
   }

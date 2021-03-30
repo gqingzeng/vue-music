@@ -1,13 +1,18 @@
 <template>
   <div class="song-list-container">
     <ul>
-      <li class="song-list" v-for="(item,index) in songList" :key="index">
+      <li
+        class="song-list"
+        v-for="(item, index) in songList"
+        :key="index"
+        @click="selectSong(item,index)"
+      >
         <div class="rank-wrapper" v-show="showIcon">
-          <span class="rank" :style="getStyle(index)">{{index + 1}}</span>
+          <span class="rank" :style="getStyle(index)">{{ index + 1 }}</span>
         </div>
         <div class="content">
-          <h2 class="name">{{item.songName}}</h2>
-          <p class="desc">{{getDesc(item.songName)}}</p>
+          <h2 class="name">{{ item.songName }}</h2>
+          <p class="desc">{{ item.fullName }}</p>
         </div>
       </li>
     </ul>
@@ -15,9 +20,8 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex";
 export default {
-  name:"SongList",
+  name: "SongList",
   props: {
     songList: {
       type: Array,
@@ -30,9 +34,6 @@ export default {
   data() {
     return {};
   },
-  computed: {
-    ...mapGetters(["singer"]),
-  },
   methods: {
     getStyle(index) {
       if (index < 3) {
@@ -41,8 +42,8 @@ export default {
         return `color: rgba(255, 255, 255, 0.5);`;
       }
     },
-    getDesc(songName) {
-      return `${this.singer.name} - ${songName}`;
+    selectSong(item,index) {
+      this.$emit('selectSong',item,index)
     },
   },
 };
@@ -71,6 +72,9 @@ export default {
       color: #fff;
       font-size: 14px;
       margin-bottom: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     .desc {
       color: rgba(255, 255, 255, 0.5);

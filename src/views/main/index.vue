@@ -1,9 +1,9 @@
 <template>
   <div id="main">
     <MyHeader />
-    <Tab :tabItems="tabItems" :value-key="name" />
+    <Tab :tabItems="tabItems" value-key="name" />
     <keep-alive>
-      <router-view />
+        <router-view />
     </keep-alive>
   </div>
 </template>
@@ -11,8 +11,9 @@
 <script>
 import MyHeader from "@/views/header/index";
 import Tab from "@/components/Tab/index";
+
 export default {
-  name:"main",
+  name: "musicMain",
   components: {
     MyHeader,
     Tab,
@@ -41,11 +42,12 @@ export default {
           path: "/search",
         },
       ],
-      name: "name",
     };
   },
 };
 </script>
 
-<style></style>
+<style>
+
+</style>
 

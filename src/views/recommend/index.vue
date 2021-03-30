@@ -1,12 +1,12 @@
 <template>
   <div class="recommend">
-    <scroll ref="scroll" class="recommend-container" :data="discList">
+    <scroll ref="scroll" class="recommend-container" :data="popularPlaylist">
       <div class="recommend-content">
         <div v-if="swiperList.length">
           <swiper :show-dots="true">
-            <div v-for="(swiperItem,index) in swiperList" :key="index">
+            <div v-for="(swiperItem, index) in swiperList" :key="index">
               <a :href="swiperItem.url">
-                <img class="needsclick" :src="swiperItem.imageUrl" @load="imgLoad" />
+                <img :src="swiperItem.imageUrl" @load="imgLoad" />
               </a>
             </div>
           </swiper>
@@ -14,20 +14,25 @@
         <div class="recommend-list">
           <h2 class="recommend-title">热门歌单推荐</h2>
           <ul class="list">
-            <li class="item" @click="selectItem(item)" v-for="item in discList" :key="item.id">
+            <li
+              class="item"
+              @click="selectItem(item)"
+              v-for="item in popularPlaylist"
+              :key="item.id"
+            >
               <div class="icon">
                 <img class="icon-left" v-lazy="item.coverImgUrl" />
               </div>
               <div class="music-content">
-                <h2 class="name">{{item.name}}</h2>
-                <p class="desc">{{item.tags.join(' | ')}}</p>
+                <h2 class="name">{{ item.name }}</h2>
+                <p class="desc">{{ item.tags.join(" | ") }}</p>
               </div>
             </li>
           </ul>
         </div>
       </div>
-      <div class="loading-wrapper" v-if="!discList.length">
-        <loading title="载入中..."></loading>
+      <div class="loading-wrapper" v-if="!popularPlaylist.length">
+        <Loading />
       </div>
     </scroll>
   </div>
@@ -35,11 +40,13 @@
 
 <script>
 import { getBanner, getPlaylist } from "@/api/recommend";
+
 import Swiper from "@/components/Swiper/index";
 import Scroll from "@/components/Scroll/index";
 import Loading from "@/components/Loading/index";
+
 export default {
-  name:"recommend",
+  name: "recommend",
   components: {
     Swiper,
     Scroll,
@@ -47,7 +54,7 @@ export default {
   },
   data() {
     return {
-      discList: [],
+      popularPlaylist: [],
       swiperList: [],
     };
   },
@@ -56,20 +63,30 @@ export default {
     this.getBanner();
   },
   methods: {
+    // 热门歌单推荐数据获取
     async getPlaylist() {
-      let res = await getPlaylist();
-      if (res.code === 200) {
-        this.discList = res.playlists;
+      const { code, playlists } = await getPlaylist();
+      if (code === 200) {
+        this.popularPlaylist = playlists;
       }
     },
+    // 获取轮播图
     async getBanner() {
-      let res = await getBanner();
-      if (res.code === 200) {
-        this.swiperList = res.banners;
+      const { code, banners } = await getBanner();
+      if (code === 200) {
+        this.swiperList = banners;
       }
     },
     selectItem(item) {
-      console.log(item);
+      const { id, name, coverImgUrl: picUrl } = item;
+      this.$router.push({
+        path: "/recommendHotDetail",
+        query: {
+          id,
+          name,
+          picUrl,
+        },
+      });
     },
     imgLoad() {
       if (!this.checkloaded) {

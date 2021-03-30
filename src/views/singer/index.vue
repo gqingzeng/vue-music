@@ -1,17 +1,18 @@
 <template>
   <div class="singer">
-    <list-view :singerList="singers" @selectItem="selectSingerItem"></list-view>
+    <ListView :singerList="singers" @selectItem="selectSingerItem" />
   </div>
 </template>
 
 <script>
 import ListView from "./components/ListView";
+
 import { getSingers } from "@/api/singer";
-import {SETSINGER} from '@/store/mutationType.js'
 
 const pinyin = require("pinyin");
+
 export default {
-  name:"singer",
+  name: "singer",
   components: {
     ListView,
   },
@@ -25,17 +26,16 @@ export default {
   },
   methods: {
     async getSingers() {
-      let res = await getSingers();
-      if (res.code === 200) {
-        let singerGroup = res.artists;
+      const { code, artists } = await getSingers();
+      if (code === 200) {
         // 新增首字母到数组中
-        singerGroup.map((item) => {
-          let letter = pinyin(item.name[0], {
+        artists.forEach((item) => {
+          const letter = pinyin(item.name[0], {
             style: pinyin.STYLE_FIRST_LETTER,
-          });
-          item.initials = letter[0][0].toUpperCase();
+          }).flat();
+          item.initials = letter[0].toUpperCase();
         });
-        this.singers = this.normalSinger(singerGroup);
+        this.singers = this.normalSinger(artists);
         // this.singers[23].items.push(
         //   {
         //     id: 1030001,
@@ -59,6 +59,7 @@ export default {
       }
     },
     normalSinger(list) {
+      console.log("list",list);
       let obj = {
         hot: {
           title: "热门",
@@ -104,19 +105,18 @@ export default {
       return hot.concat(ret);
     },
     selectSingerItem(item) {
-      // console.log(item);
+      console.log(item);
       this.$router.push({
-        path: "/musicList",
+        path: "/singerDetail",
         query: {
           id: item.id,
+          name: item.name,
+          picUrl: item.picUrl,
         },
       });
-      // 把值存储在veux的singer中
-      this.$store.commit(SETSINGER,item)
     },
   },
 };
 </script>
 
-<style scoped lang="scss">
-</style>
+<style scoped lang="scss"></style>

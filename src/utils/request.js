@@ -2,19 +2,19 @@ import axios from 'axios'
 
 const request = axios.create({
   baseURL: process.env.VUE_APP_BASE_API,
-  timeout: 60000,
+  timeout: 3000,
   xhrFields: {
     withCredentials: true
   }
 })
 
 request.interceptors.response.use(res => {
-  if (res.data.code === 200) {
-    return res.data
+  const { status, data } = res
+  if (status === 200) {
+    return data
   }
 }, err => {
-  console.log(err.response);
-  return Promise.resolve(err.response)
+  return Promise.reject(err)
 })
 
 export default request

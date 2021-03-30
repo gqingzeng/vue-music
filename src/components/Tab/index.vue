@@ -1,8 +1,10 @@
 <template>
   <div class="tab-container">
     <div class="tab-list">
-      <div class="tab-item-wrapper" v-for="(item,index) in tabItems" :key="index">
-        <span ref="tab" class="tab-item" @click="clickTab(item,index)">{{item[valueKey]}}</span>
+      <div class="tab-item-wrapper" v-for="(item, index) in tabItems" :key="index">
+        <span ref="tab" class="tab-item" @click="clickTab(item, index)">{{
+          item[valueKey]
+        }}</span>
       </div>
     </div>
     <div class="line" :style="tabSize[tabIndex]"></div>
@@ -11,15 +13,13 @@
 
 <script>
 export default {
-  name:"Tab",
+  name: "Tab",
   props: {
     tabItems: {
       type: Array,
       required: true,
     },
-    /**
-     * 选项对象中，选项文字对应的键名
-     */
+    // 选项对象中，选项文字对应的键名
     valueKey: {
       type: String,
     },
@@ -34,29 +34,27 @@ export default {
     this.initTabLine();
   },
   methods: {
-    // 点击tab
+    // 点击tab,显示对应的内容
     clickTab(item, index) {
       this.tabIndex = index;
-      if (this.$route.path !== item.path) {
+      const { path } = item;
+      // 解决再次点击时报错
+      if (this.$route.path !== path) {
         this.$router.push({
-          path: item.path,
+          path,
         });
       }
-      console.log(this.$route.path);
-
     },
     // 初始化tab下划线的宽度和水平偏移量
     initTabLine() {
       const tabItem = this.$refs.tab;
-      const tabSize = [];
-      tabItem.forEach((item) => {
-        const size = {
-          width: `${item.offsetWidth}px`,
-          transform: `translateX(${item.offsetLeft}px)`,
+      this.tabSize = tabItem.map((item) => {
+        const { offsetWidth, offsetLeft } = item;
+        return {
+          width: `${offsetWidth}px`,
+          transform: `translateX(${offsetLeft}px)`,
         };
-        tabSize.push(size);
       });
-      this.tabSize = tabSize;
       this.getCurrentIndex();
     },
     getCurrentIndex() {

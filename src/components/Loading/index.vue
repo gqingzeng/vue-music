@@ -11,6 +11,7 @@ export default {
   props: {
     title: {
       type: String,
+      default:"载入中..."
     },
   },
   data() {

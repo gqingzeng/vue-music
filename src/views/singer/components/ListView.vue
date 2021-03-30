@@ -9,17 +9,22 @@
       @scroll="scroll"
     >
       <ul class="singer-list">
-        <li class="singer-item" v-for="(item,index) in singerList" :key="index" ref="singerItem">
-          <h2 class="title">{{item.title}}</h2>
+        <li
+          class="singer-item"
+          ref="singerItem"
+          v-for="(item, index) in singerList"
+          :key="index"
+        >
+          <h2 class="title">{{ item.title }}</h2>
           <ul>
             <li
               class="singer-group"
-              v-for="(singerItem,singerIndex) in item.items"
+              v-for="(singerItem, singerIndex) in item.items"
               :key="singerIndex"
               @click="slectItem(singerItem)"
             >
               <img class="icon-singer" v-lazy="singerItem.picUrl" />
-              <span class="name">{{singerItem.name}}</span>
+              <span class="name">{{ singerItem.name }}</span>
             </li>
           </ul>
         </li>
@@ -28,15 +33,17 @@
         <ul>
           <li
             class="letter"
-            :class="{'letter-active':currentIndex == index}"
-            v-for="(shortcutItem,index) in shortcut"
-            :key="index"
+            :class="{ 'letter-active': currentIndex == index }"
             :data-index="index"
-          >{{shortcutItem}}</li>
+            v-for="(shortcutItem, index) in shortcut"
+            :key="index"
+          >
+            {{ shortcutItem }}
+          </li>
         </ul>
       </div>
       <div class="loading-wrapper" v-if="!singerList.length">
-        <loading title="载入中..."></loading>
+        <Loading />
       </div>
     </scroll>
   </div>
@@ -46,7 +53,7 @@
 import Scroll from "@/components/Scroll";
 import Loading from "@/components/Loading";
 export default {
-  name:"ListView",
+  name: "ListView",
   components: {
     Scroll,
     Loading,
@@ -79,7 +86,6 @@ export default {
       for (let i = 0; i < height.length - 1; i++) {
         if (-newVal >= height[i] && -newVal < height[i + 1]) {
           this.currentIndex = i;
-          // console.log(this.currentIndex, "---");
           return;
         }
       }
