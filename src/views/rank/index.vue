@@ -13,14 +13,9 @@
             @click="enterClick(item)"
           >
             <span class="desc"
-              >{{ trackIndex + 1 }}{{ trackItem.first }}-{{
-                trackItem.second
-              }}</span
+              >{{ trackIndex + 1 }}{{ trackItem.first }}-{{ trackItem.second }}</span
             >
           </li>
-          <!-- <li class="song-item" v-for="(trackItem,trackIndex) in item.tracks" :key="trackIndex">        
-            <span class="desc">{{trackIndex + 1}} - {{trackItem.name}}</span>
-          </li> -->
         </ul>
       </li>
     </ul>
@@ -28,9 +23,7 @@
 </template>
 
 <script>
-
 import { getRankList } from "@/api/rank";
-// import {getRankList, getSongList} from '@/api/rank'
 
 export default {
   data() {
@@ -43,48 +36,23 @@ export default {
   },
   methods: {
     async _getRankList() {
-      let res = await getRankList();
-      this.rankList = res.list.slice(0, 4);
+      const { code, list } = await getRankList();
+      if (code === 200) {
+        this.rankList = list.slice(0, 4);
+      }
     },
     enterClick(item) {
       console.log(item);
+      const { id, name, coverImgUrl: picUrl } = item;
       this.$router.push({
         path: "/rankDetail",
         query: {
-          id: item.id,
-          name:item.name,
-          picUrl:item.coverImgUrl
+          id,
+          name,
+          picUrl,
         },
       });
-    
     },
-
-    //  async _getRankList(){
-    //    let res = await getRankList();
-    //    console.log(res);
-    //    if(res.code === 200){
-    //      this.rankList = this.handleData(res.list);
-    //      console.log(this.rankList);
-    //      this.rankList.forEach((item,index) =>{
-    //        this._getSongList(item.id,index)
-    //      })
-    //    }
-    //   },
-    //   handleData(arrList){
-    //    return arrList.map(item =>{
-    //        const coverImgUrl = item.coverImgUrl;
-    //        const id = item.id;
-    //       return {coverImgUrl,id}
-    //     })
-    //   },
-    //   async _getSongList(id,index){
-    //     let res = await getSongList({
-    //       id:id
-    //     })
-    //     console.log(res);
-    //     this.$set(this.rankList[index],'tracks',res.playlist.tracks.slice(0,3))
-    //     console.log(this.rankList);
-    //   }
   },
 };
 </script>
