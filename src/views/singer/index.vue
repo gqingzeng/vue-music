@@ -1,6 +1,7 @@
 <template>
   <div class="singer">
     <ListView :singerList="singers" @selectItem="selectSingerItem" />
+    <router-view></router-view>
   </div>
 </template>
 

@@ -1,23 +1,18 @@
 <template>
-  <div class="singer-container">
-    <MusicList :musicList="musicList" />
-    <div class="loading-wrapper" v-show="!musicList.length">
-      <Loading title="载入中..." />
-    </div>
-  </div>
+  <transition name="slide">
+    <MusicList :musicList="musicList" v-if="musicList.length"/>
+  </transition>
 </template>
 
 <script>
 import { getArtists } from "@/api/singer";
 
 import MusicList from "../components/MusicList";
-import Loading from "@/components/Loading/index";
 
 export default {
   name: "singerDetail",
   components: {
     MusicList,
-    Loading,
   },
   data() {
     return {
@@ -56,16 +51,12 @@ export default {
 </script>
 
 <style scoped lang="scss">
-.singer-container {
-  position: absolute;
-  top: 0;
-  width: 100%;
+.slide-enter-active,
+.slide-leave-active {
+  transition: all .5s;
 }
-.loading-wrapper {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  padding-top: 80%;
-  transform: translate(-50%);
+.slide-enter,
+.slide-leave-to {
+  transform: translate3d(100%, 0, 0);
 }
 </style>
