@@ -1,25 +1,30 @@
 <template>
   <div id="app">
+    <MyHeader />
+    <Tab :tabItems="tabItems" value-key="name" />
     <keep-alive>
       <router-view v-if="$route.meta.keepAlive" />
     </keep-alive>
     <router-view v-if="!$route.meta.keepAlive" />
     <MyPlayer />
-    
   </div>
 </template>
 
 <script>
+import Tab from "@/components/Tab/index";
+import MyHeader from "@/views/header/index";
 import MyPlayer from "@/components/player/index";
 
 export default {
   name: "musicMain",
   components: {
+    Tab,
+    MyHeader,
     MyPlayer,
   },
   data() {
     return {
-      tabItems: [
+       tabItems: [
         {
           id: 0,
           name: "推荐",
@@ -49,17 +54,5 @@ export default {
 <style>
 body {
   background: #222;
-}
-
-.slide-fade-enter-active {
-  transition: all 0.3s ease;
-}
-.slide-fade-leave-active {
-  transition: all 0.8s cubic-bezier(1, 0.5, 0.8, 1);
-}
-.slide-fade-enter,
-.slide-fade-leave-to {
-  transform: translateX(10px);
-  opacity: 0;
 }
 </style>
