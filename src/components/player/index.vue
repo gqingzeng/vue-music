@@ -4,7 +4,7 @@
     <div class="normal-player" v-show="fullScreen">
       <div class="top">
         <img class="back" src="../../assets/img/arrow-down.png" />
-        <h1 class="title">萨达开始加大数据库的速度是的撒大苏打</h1>
+        <h1 class="title">萨达开始加大数据库的速度是   的撒大苏打</h1>
         <h2 class="subtitle">aa</h2>
       </div>
       <div class="middle">
