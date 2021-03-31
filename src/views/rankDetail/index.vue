@@ -1,17 +1,11 @@
 <template>
-  <div class="rank-container">
-    <transition name="slide-fade">
-      <MusicList :musicList="musicList" />
-    </transition>
-    <div class="loading-wrapper" v-show="!musicList.length">
-      <Loading title="载入中..." />
-    </div>
-  </div>
+  <transition name="slide">
+    <MusicList :musicList="musicList" v-if="musicList.length"/>
+  </transition>
 </template>
 
 <script>
 import MusicList from "../components/MusicList";
-import Loading from "@/components/Loading/index";
 
 import { getSongList } from "@/api/rank";
 
@@ -19,7 +13,6 @@ export default {
   name: "rankList",
   components: {
     MusicList,
-    Loading,
   },
   data() {
     return {
@@ -53,16 +46,12 @@ export default {
 </script>
 
 <style scoped lang="scss">
-.rank-container {
-  position: absolute;
-  top: 0;
-  width: 100%;
+.slide-enter-active,
+.slide-leave-active {
+  transition: all 0.3s;
 }
-.loading-wrapper {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  padding-top: 80%;
-  transform: translate(-50%);
+.slide-enter,
+.slide-leave-to {
+  transform: translate3d(100%, 0, 0);
 }
 </style>
