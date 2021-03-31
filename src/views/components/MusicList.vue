@@ -6,30 +6,36 @@
     </div>
 
     <div class="music-list-image" :style="bgStyle" ref="bgImage">
-      <div class="playBtn" @click="randomPlay">
+      <div class="playBtn" @click="randomPlay" v-show="musicList.length">
         <img class="icon-play" src="@/assets/img/play.png" />
         <span class="text">随机播放全部</span>
       </div>
       <div class="filter"></div>
     </div>
 
-    <div class="song-list-wrapper">
+    <div class="song-list-wrapper" >
       <scroll class="song-list" :data="musicList" ref="songList">
         <SongList :songList="musicList" @selectSong="selectSong" />
       </scroll>
     </div>
+    <div class="loading-wrapper" v-show="!musicList.length">
+        <Loading title="载入中..." />
+      </div>
   </div>
 </template>
 
 <script>
 import SongList from "views/components/SongList";
 import Scroll from "@/components/Scroll";
+import Loading from "@/components/Loading/index";
+
 import { mapActions } from "vuex";
 
 export default {
   name: "MusicList",
   components: {
     SongList,
+    Loading,
     Scroll,
   },
   props: {
@@ -68,6 +74,14 @@ export default {
 </script>
 
 <style scoped lang="scss">
+.music-list {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: #222;
+}
 .song-list-wrapper {
   position: fixed;
   top: 0;
@@ -89,8 +103,8 @@ export default {
   width: 100%;
 
   .icon-zuojiantou {
-    position:relative;
-    top:50%;
+    position: relative;
+    top: 50%;
     left: 10px;
     transform: translateY(-50%);
     font-size: 24px;
@@ -144,4 +158,11 @@ export default {
     background: rgba(0, 0, 0, 0.5);
   }
 }
+.loading-wrapper {
+  position: absolute;
+  left: 50%;
+  padding-top: 50%;
+  transform: translate(-50%);
+}
+
 </style>
