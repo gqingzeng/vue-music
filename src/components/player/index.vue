@@ -138,58 +138,58 @@ export default {
   }
 }
 
-// .play-container {
-//   width: 100%;
-//   height: 100%;
-//   top: 0;
-//   position: absolute;
-//   z-index: 99;
-//   background: #fff;
-// }
-// .mini {
-//   &-player {
-//     display: flex;
-//     align-items: center;
-//     position: fixed;
-//     bottom: 0;
-//     width: 100%;
-//     height: 60px;
-//     background: #333;
-//   }
-//   &-img .pic {
-//     width: 45px;
-//     height: 45px;
-//     padding: 0 10px 0 20px;
-//     border-radius: 50%;
-//   }
-//   &-desc {
-//     flex: 1;
-//     overflow: hidden;
-//     .song-name {
-//       overflow: hidden;
-//       text-overflow: ellipsis;
-//       white-space: nowrap;
-//       color: #fff;
-//     }
-//     .author {
-//       overflow: hidden;
-//       text-overflow: ellipsis;
-//       white-space: nowrap;
-//       color: rgba(255, 255, 255, 0.3);
-//     }
-//   }
-//   &-control {
-//     padding: 0 5px;
-//     .iconfont {
-//       font-size: 40px;
-//       color: #ffcd32;
-//     }
-//     .icon-bofang {
-//       font-size: 35px;
-//     }
-//     .icon-zanting {
-//       font-size: 35px;
-//     }
-//   }
-// }
+.play-container {
+  width: 100%;
+  height: 100%;
+  top: 0;
+  position: absolute;
+  z-index: 99;
+  background: #fff;
+}
+.mini {
+  &-player {
+    display: flex;
+    align-items: center;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    height: 60px;
+    background: #333;
+  }
+  &-img .pic {
+    width: 45px;
+    height: 45px;
+    padding: 0 10px 0 20px;
+    border-radius: 50%;
+  }
+  &-desc {
+    flex: 1;
+    overflow: hidden;
+    .song-name {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      color: #fff;
+    }
+    .author {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      color: rgba(255, 255, 255, 0.3);
+    }
+  }
+  &-control {
+    padding: 0 5px;
+    .iconfont {
+      font-size: 40px;
+      color: #ffcd32;
+    }
+    .icon-bofang {
+      font-size: 35px;
+    }
+    .icon-zanting {
+      font-size: 35px;
+    }
+  }
+}
 </style>
