@@ -65,9 +65,6 @@ const routes = [{
       keepAlive: true
     },
   },
-
-
-
 ]
 
 const router = new VueRouter({
