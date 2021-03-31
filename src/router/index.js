@@ -45,7 +45,6 @@ const routes = [{
     component: () => import('@/views/rank/index.vue'),
     meta: {
       title: "排行",
-      keepAlive: true
     },
     children: [{
       path: '/rankDetail',
