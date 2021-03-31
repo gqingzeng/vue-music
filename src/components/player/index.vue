@@ -2,9 +2,6 @@
   <div class="play-container" v-show="playList.length > 0">
     <!-- 全屏播放器 -->
     <div class="normal-player" v-show="fullScreen">
-      <!-- <div class="background">
-        <img src="../../assets/logo.png"/>
-      </div> -->
       <div class="top">
         <img class="back" src="../../assets/img/arrow-down.png" />
         <h1 class="title">萨达开始加大数据库的速度是的撒大苏打</h1>
