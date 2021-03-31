@@ -8,7 +8,7 @@ Vue.use(Vuex)
 
 const store = new Vuex.Store({
   state:{
-    singer:{},
+    singer:{}, // 歌手
     playing:false,// 播放状态
     fullScreen:false,// 是否全屏
     playList:[], // 播放列表
