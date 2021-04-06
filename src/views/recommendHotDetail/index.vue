@@ -1,11 +1,12 @@
 <template>
   <transition name="slide">
-    <MusicList :musicList="musicList" v-if="musicList.length"/>
+    <MusicList :musicList="musicList" v-if="musicList.length" />
   </transition>
 </template>
 
 <script>
 import { getSongList } from "@/api/rank";
+import { getSongUrl } from "@/api/player";
 
 import MusicList from "../components/MusicList";
 
@@ -33,10 +34,16 @@ export default {
     },
     handleData(musicList) {
       return musicList.map((item) => {
+        console.log(item);
         const { id, name: songName, ar } = item;
+        const url = getSongUrl(id);
+        const singer = item.ar[0].name;
+        const { picUrl } = item.al;
         return {
-          id,
+          url,
           songName,
+          singer,
+          picUrl,
           fullName: `${songName}-${ar[0].name}`,
         };
       });

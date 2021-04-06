@@ -1,6 +1,6 @@
 <template>
   <transition name="slide">
-    <MusicList :musicList="musicList" v-if="musicList.length"/>
+    <MusicList :musicList="musicList" v-if="musicList.length" />
   </transition>
 </template>
 
@@ -8,6 +8,7 @@
 import MusicList from "../components/MusicList";
 
 import { getSongList } from "@/api/rank";
+import { getSongUrl } from "@/api/player";
 
 export default {
   name: "rankList",
@@ -34,9 +35,14 @@ export default {
     handleData(data) {
       return data.map((item) => {
         const { id, name: songName, ar } = item;
+        const url = getSongUrl(id);
+        const singer = item.ar[0].name;
+        const { picUrl } = item.al;
         return {
-          id,
+          url,
           songName,
+          picUrl,
+          singer,
           fullName: `${songName}-${ar[0].name}`,
         };
       });
