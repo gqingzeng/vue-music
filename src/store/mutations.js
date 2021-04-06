@@ -1,6 +1,5 @@
 import * as type from './mutationType'
 
-// console.log("a",type);
 const mutations = {
   [type.SET_SINGER](state,singer){
     state.singer = singer
