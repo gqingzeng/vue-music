@@ -24,7 +24,7 @@ export default {
   },
   data() {
     return {
-       tabItems: [
+      tabItems: [
         {
           id: 0,
           name: "推荐",
