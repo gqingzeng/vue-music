@@ -1,6 +1,6 @@
 <template>
   <div class="header-container">
-    <h1 class="title">VMusic</h1>
+    <h1 class="title">网易云</h1>
     <i class="iconfont icon-liebiao" @click="personClick"></i>
   </div>
 </template>
