@@ -1,48 +1,51 @@
 <template>
-  <div class="recommend">
-    <scroll ref="scroll" class="recommend-container" :data="popularPlaylist">
-      <div class="recommend-content">
-        <div v-if="swiperList.length">
-          <swiper :show-dots="true">
-            <div v-for="(swiperItem, index) in swiperList" :key="index">
-              <a :href="swiperItem.url">
-                <img :src="swiperItem.imageUrl" @load="imgLoad" />
-              </a>
+  <scroll ref="scroll" class="recommend" :data="popularPlaylist">
+    <div class="recommend-content">
+      <div v-if="swiperList.length">
+        <swiper :show-dots="true">
+          <div v-for="(swiperItem, index) in swiperList" :key="index">
+            <a :href="swiperItem.url">
+              <img :src="swiperItem.imageUrl" @load="imgLoad" />
+            </a>
+          </div>
+        </swiper>
+      </div>
+      <div class="recommend-list">
+        <h2 class="recommend-title">热门歌单推荐</h2>
+        <ul class="list">
+          <li
+            class="item"
+            @click="selectItem(item)"
+            v-for="item in popularPlaylist"
+            :key="item.id"
+          >
+            <div class="icon">
+              <img class="icon-left" v-lazy="item.coverImgUrl" />
             </div>
-          </swiper>
-        </div>
-        <div class="recommend-list">
-          <h2 class="recommend-title">热门歌单推荐</h2>
-          <ul class="list">
-            <li
-              class="item"
-              @click="selectItem(item)"
-              v-for="item in popularPlaylist"
-              :key="item.id"
-            >
-              <div class="icon">
-                <img class="icon-left" v-lazy="item.coverImgUrl" />
-              </div>
-              <div class="music-content">
-                <h2 class="name">{{ item.name }}</h2>
-                <p class="desc">{{ item.tags.join(" | ") }}</p>
-              </div>
-            </li>
-          </ul>
-        </div>
+            <div class="music-content">
+              <h2 class="name">{{ item.name }}</h2>
+              <p class="desc">{{ item.tags.join(" | ") }}</p>
+            </div>
+          </li>
+        </ul>
       </div>
-      <div class="loading-wrapper" v-if="!popularPlaylist.length">
-        <Loading />
-      </div>
-    </scroll>
-  </div>
+    </div>
+    <div class="loading-wrapper" v-if="!popularPlaylist.length">
+      <Loading />
+    </div>
+  </scroll>
 </template>
 
 <script>
 import Swiper from "@/components/Swiper/index";
 import Scroll from "@/components/Scroll/index";
 import Loading from "@/components/Loading/index";
+
+import { mapGetters } from "vuex";
+import { PlayListMixin } from "@/common/mixin";
+
 export default {
+  mixins: [PlayListMixin],
   components: {
     Swiper,
     Scroll,
@@ -51,15 +54,22 @@ export default {
   props: {
     popularPlaylist: {
       type: Array,
-      defaults: [],
+      default() {
+        return [];
+      },
     },
     swiperList: {
       type: Array,
-      defaults: [],
+      default() {
+        return [];
+      },
     },
   },
   data() {
     return {};
+  },
+  computed: {
+    ...mapGetters(["fullScreen", "playList"]),
   },
   methods: {
     selectItem(item) {
@@ -67,6 +77,11 @@ export default {
     },
     imgLoad() {
       this.$emit("imgLoad");
+    },
+    handlePlayList(playList) {
+      const bottom = playList.length > 0 ? "60px" : "";
+      this.$refs.scroll.$el.style.bottom = bottom;
+      this.$refs.scroll.refresh();
     },
   },
 };
@@ -78,10 +93,7 @@ export default {
   top: 90px;
   bottom: 0;
   width: 100%;
-  &-container {
-    height: 100%;
-    overflow: hidden;
-  }
+  overflow: hidden;
   &-title {
     height: 65px;
     line-height: 65px;

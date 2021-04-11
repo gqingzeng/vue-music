@@ -30,19 +30,18 @@ export default {
       const params = { id };
       const { code, hotSongs } = await getArtists(params);
       if (code === 200) {
-        console.log(hotSongs);
         this.musicList = this.normalData(hotSongs);
       }
     },
     normalData(data) {
       return data.map((item) => {
-        console.log("singerDetail", item);
         const { id, name: songName } = item;
         const url = getSongUrl(id);
         const { picUrl } = item.al;
         const singer = item.ar[0].name;
         const fullName = `${songName}-${singer}`;
         return {
+          id,
           url,
           singer,
           songName,

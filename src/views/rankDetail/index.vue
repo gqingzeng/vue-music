@@ -39,6 +39,7 @@ export default {
         const singer = item.ar[0].name;
         const { picUrl } = item.al;
         return {
+          id,
           url,
           songName,
           picUrl,

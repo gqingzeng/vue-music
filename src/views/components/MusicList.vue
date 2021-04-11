@@ -13,11 +13,9 @@
       <div class="filter"></div>
     </div>
 
-    <div class="song-list-wrapper">
-      <scroll class="song-list" :data="musicList" ref="songList">
-        <SongList :songList="musicList" @selectSong="selectSong" />
-      </scroll>
-    </div>
+    <scroll class="song-list-wrapper" :data="musicList" ref="songList">
+      <SongList :songList="musicList" @selectSong="selectSong" />
+    </scroll>
     <div class="loading-wrapper" v-show="!musicList.length">
       <Loading title="载入中..." />
     </div>
@@ -30,9 +28,11 @@ import Scroll from "@/components/Scroll";
 import Loading from "@/components/Loading/index";
 
 import { mapActions } from "vuex";
+import { PlayListMixin } from "@/common/mixin";
 
 export default {
   name: "MusicList",
+  mixins: [PlayListMixin],
   components: {
     SongList,
     Loading,
@@ -55,6 +55,7 @@ export default {
     },
   },
   methods: {
+    ...mapActions(["setectPlay", "randomPlay"]),
     // 歌曲列表项
     selectSong(item, index) {
       this.setectPlay({
@@ -62,7 +63,7 @@ export default {
         index,
       });
       console.log(item);
-      console.log("index",index);
+      console.log("index", index);
     },
     back() {
       this.$router.go(-1);
@@ -70,7 +71,11 @@ export default {
     randomPlayHandle() {
       this.randomPlay({ list: this.musicList });
     },
-    ...mapActions(["setectPlay", "randomPlay"]),
+    handlePlayList(playList) {
+      const bottom = playList.length > 0 ? "60px" : "";
+      this.$refs.songList.$el.style.bottom = bottom;
+      this.$refs.songList.refresh();
+    },
   },
 };
 </script>
@@ -86,15 +91,10 @@ export default {
 }
 .song-list-wrapper {
   position: fixed;
-  top: 0;
-  padding-top: 70%;
+  top: 40%;
   bottom: 0;
   width: 100%;
-  .song-list {
-    position: relative;
-    height: 100%;
-    overflow: hidden;
-  }
+  overflow: hidden;
 }
 .music-list-top {
   display: flex;

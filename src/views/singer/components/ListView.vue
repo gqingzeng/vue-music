@@ -1,59 +1,62 @@
 <template>
-  <div class="list-view-container">
-    <scroll
-      class="list-view"
-      ref="listView"
-      :data="singerList"
-      :listenScroll="listenScroll"
-      :probeType="probeType"
-      @scroll="scroll"
-    >
-      <ul class="singer-list">
-        <li
-          class="singer-item"
-          ref="singerItem"
-          v-for="(item, index) in singerList"
-          :key="index"
-        >
-          <h2 class="title">{{ item.title }}</h2>
-          <ul>
-            <li
-              class="singer-group"
-              v-for="(singerItem, singerIndex) in item.items"
-              :key="singerIndex"
-              @click="slectItem(singerItem)"
-            >
-              <img class="icon-singer" v-lazy="singerItem.picUrl" />
-              <span class="name">{{ singerItem.name }}</span>
-            </li>
-          </ul>
-        </li>
-      </ul>
-      <div class="list-shortcut" @touchstart="shortcutTouchStart">
+  <scroll
+    class="list-view-container"
+    ref="listView"
+    :data="singerList"
+    :listenScroll="listenScroll"
+    :probeType="probeType"
+    @scroll="scroll"
+  >
+    <ul class="singer-list">
+      <li
+        class="singer-item"
+        ref="singerItem"
+        v-for="(item, index) in singerList"
+        :key="index"
+      >
+        <h2 class="title">{{ item.title }}</h2>
         <ul>
           <li
-            class="letter"
-            :class="{ 'letter-active': currentIndex == index }"
-            :data-index="index"
-            v-for="(shortcutItem, index) in shortcut"
-            :key="index"
+            class="singer-group"
+            v-for="(singerItem, singerIndex) in item.items"
+            :key="singerIndex"
+            @click="slectItem(singerItem)"
           >
-            {{ shortcutItem }}
+            <img class="icon-singer" v-lazy="singerItem.picUrl" />
+            <span class="name">{{ singerItem.name }}</span>
           </li>
         </ul>
-      </div>
-      <div class="loading-wrapper" v-if="!singerList.length">
-        <Loading />
-      </div>
-    </scroll>
-  </div>
+      </li>
+    </ul>
+    <div class="list-shortcut" @touchstart="shortcutTouchStart">
+      <ul>
+        <li
+          class="letter"
+          :class="{ 'letter-active': currentIndex == index }"
+          :data-index="index"
+          v-for="(shortcutItem, index) in shortcut"
+          :key="index"
+        >
+          {{ shortcutItem }}
+        </li>
+      </ul>
+    </div>
+    <div class="loading-wrapper" v-if="!singerList.length">
+      <Loading />
+    </div>
+  </scroll>
 </template>
 
 <script>
 import Scroll from "@/components/Scroll";
 import Loading from "@/components/Loading";
+
+import { mapGetters } from "vuex";
+import { PlayListMixin } from "@/common/mixin";
+
 export default {
   name: "ListView",
+  mixins: [PlayListMixin],
   components: {
     Scroll,
     Loading,
@@ -100,6 +103,7 @@ export default {
         return item.title.substr(0, 1);
       });
     },
+    ...mapGetters(["fullScreen"]),
   },
   mounted() {
     this.refresh();
@@ -137,6 +141,11 @@ export default {
     slectItem(item) {
       this.$emit("selectItem", item);
     },
+    handlePlayList(playlist) {
+      const bottom = playlist.length > 0 ? "60px" : "";
+      this.$refs.listView.$el.style.bottom = bottom;
+      this.$refs.listView.refresh();
+    },
   },
 };
 </script>
@@ -147,52 +156,48 @@ export default {
   top: 90px;
   width: 100%;
   bottom: 0;
-  .list-view {
-    position: relative;
-    height: 100%;
-    overflow: hidden;
-    .singer-item {
-      padding-bottom: 20px;
-      .title {
-        height: 30px;
-        line-height: 30px;
-        padding-left: 20px;
-        font-size: 12px;
-        color: rgba(255, 255, 255, 0.5);
-        background: #333;
-      }
-      .singer-group {
-        display: flex;
-        align-items: center;
-        padding: 20px 0 0 30px;
-        .icon-singer {
-          width: 50px;
-          height: 50px;
-          border-radius: 50%;
-        }
-        .name {
-          color: rgba(255, 255, 255, 0.5);
-          margin-left: 20px;
-          font-size: 14px;
-        }
-      }
-    }
-    .list-shortcut {
-      position: absolute;
-      right: 0;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 20px;
-      text-align: center;
-      padding: 20px 0;
-      border-radius: 10px;
-      background: #000;
-      color: rgba(255, 255, 255, 0.5);
+  overflow: hidden;
+  .singer-item {
+    padding-bottom: 20px;
+    .title {
+      height: 30px;
+      line-height: 30px;
+      padding-left: 20px;
       font-size: 12px;
+      color: rgba(255, 255, 255, 0.5);
+      background: #333;
     }
-    .letter-active {
-      color: #ffcd32;
+    .singer-group {
+      display: flex;
+      align-items: center;
+      padding: 20px 0 0 30px;
+      .icon-singer {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+      }
+      .name {
+        color: rgba(255, 255, 255, 0.5);
+        margin-left: 20px;
+        font-size: 14px;
+      }
     }
+  }
+  .list-shortcut {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;
+    text-align: center;
+    padding: 20px 0;
+    border-radius: 10px;
+    background: #000;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 12px;
+  }
+  .letter-active {
+    color: #ffcd32;
   }
 }
 .loading-wrapper {
