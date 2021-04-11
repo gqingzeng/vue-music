@@ -303,7 +303,6 @@ export default {
       const { id } = this.currentSong;
       const params = { id };
       const res = await getLyric(params);
-      console.log("res", res);
       if (res.code === 200) {
         let reg = /\[(.*)\](.*)\n/gim;
         let result;

@@ -10,7 +10,6 @@ function findCurrentIndex(list, currentSong) {
   return list.findIndex((item) => item.id === currentSong.id)}
 
 export const setectPlay = ({commit,state}, {list,index}) => {
-  console.log("state.mode",state.mode);
   commit(type.SET_SEQUENCELIST, list)
   if(state.mode === playMode.random){
     const randomList = shuffle(list)
