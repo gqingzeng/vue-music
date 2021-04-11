@@ -62,8 +62,6 @@ export default {
         list: this.musicList,
         index,
       });
-      console.log(item);
-      console.log("index", index);
     },
     back() {
       this.$router.go(-1);
