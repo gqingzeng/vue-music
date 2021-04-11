@@ -9,49 +9,50 @@
         @click="delSearchValueHandler"
       ></i>
     </div>
-    <div class="shortcut-wrapper">
-      <scroll ref="scroll" class="shortcut" :data="searchList">
-        <div>
-          <div class="hot-search-wrapper">
-            <h1 class="title">热门搜索</h1>
-            <ul>
-              <li class="item" v-for="(item, index) in searchList" :key="index">
-                <span @click="hotClickHandler(item)">{{ item.first }}</span>
-              </li>
-            </ul>
-          </div>
-          <div class="search-history-wrapper">
-            <div class="search-head" v-show="isShowHistory">
-              <span>搜索历史</span>
-              <i class="iconfont icon-shanchu1" @click="delAllHistoryHandler"></i>
-            </div>
-            <ul>
-              <li
-                class="search-list"
-                v-for="(historyItem, historyIndex) in historyList"
-                :key="historyIndex"
-              >
-                <span>{{ historyItem }}</span>
-                <i
-                  class="iconfont icon-shanchu11"
-                  @click="delHistoryItemHandler(historyIndex)"
-                ></i>
-              </li>
-            </ul>
-          </div>
+    <scroll ref="scroll" class="shortcut-wrapper" :data="searchList">
+      <div>
+        <div class="hot-search-wrapper">
+          <h1 class="title">热门搜索</h1>
+          <ul>
+            <li class="item" v-for="(item, index) in searchList" :key="index">
+              <span @click="hotClickHandler(item)">{{ item.first }}</span>
+            </li>
+          </ul>
         </div>
-      </scroll>
-    </div>
+        <div class="search-history-wrapper">
+          <div class="search-head" v-show="isShowHistory">
+            <span>搜索历史</span>
+            <i class="iconfont icon-shanchu1" @click="delAllHistoryHandler"></i>
+          </div>
+          <ul>
+            <li
+              class="search-list"
+              v-for="(historyItem, historyIndex) in historyList"
+              :key="historyIndex"
+            >
+              <span>{{ historyItem }}</span>
+              <i
+                class="iconfont icon-shanchu11"
+                @click="delHistoryItemHandler(historyIndex)"
+              ></i>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </scroll>
   </div>
 </template>
 
 <script>
 import { getHotSearch } from "@/api/search";
+import { mapGetters } from "vuex";
+import { PlayListMixin } from "@/common/mixin";
 
 import Scroll from "@/components/Scroll/index";
 
 export default {
   name: "search",
+  mixins: [PlayListMixin],
   components: {
     Scroll,
   },
@@ -73,6 +74,9 @@ export default {
       ],
       isShowHistory: true,
     };
+  },
+  computed: {
+    ...mapGetters(["fullScreen"]),
   },
   created() {
     this.getHotSearch();
@@ -110,6 +114,11 @@ export default {
         this.$refs.scroll.refresh();
       }
     },
+    handlePlayList(playList) {
+      const bottom = playList.length > 0 ? "60px" : "";
+      this.$refs.scroll.$el.style.bottom = bottom;
+      this.$refs.scroll.refresh();
+    },
   },
 };
 </script>
@@ -142,10 +151,7 @@ export default {
   top: 178px;
   bottom: 0;
   width: 100%;
-  .shortcut {
-    height: 100%;
-    overflow: hidden;
-  }
+  overflow: hidden;
 }
 .hot-search-wrapper {
   margin: 0 20px 20px 20px;
