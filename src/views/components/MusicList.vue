@@ -6,21 +6,21 @@
     </div>
 
     <div class="music-list-image" :style="bgStyle" ref="bgImage">
-      <div class="playBtn" @click="randomPlay" v-show="musicList.length">
+      <div class="playBtn" v-show="musicList.length" @click="randomPlayHandle">
         <img class="icon-play" src="@/assets/img/play.png" />
         <span class="text">随机播放全部</span>
       </div>
       <div class="filter"></div>
     </div>
 
-    <div class="song-list-wrapper" >
+    <div class="song-list-wrapper">
       <scroll class="song-list" :data="musicList" ref="songList">
         <SongList :songList="musicList" @selectSong="selectSong" />
       </scroll>
     </div>
     <div class="loading-wrapper" v-show="!musicList.length">
-        <Loading title="载入中..." />
-      </div>
+      <Loading title="载入中..." />
+    </div>
   </div>
 </template>
 
@@ -62,13 +62,15 @@ export default {
         index,
       });
       console.log(item);
-      console.log(index);
+      console.log("index",index);
     },
     back() {
       this.$router.go(-1);
     },
-    randomPlay() {},
-    ...mapActions(["setectPlay"]),
+    randomPlayHandle() {
+      this.randomPlay({ list: this.musicList });
+    },
+    ...mapActions(["setectPlay", "randomPlay"]),
   },
 };
 </script>
@@ -164,5 +166,4 @@ export default {
   padding-top: 50%;
   transform: translate(-50%);
 }
-
 </style>
