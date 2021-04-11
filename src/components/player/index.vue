@@ -10,33 +10,52 @@
         <h3 class="title">{{ currentSong.songName }}</h3>
         <h2 class="subtitle">{{ currentSong.singer }}</h2>
       </div>
-      <div class="middle">
-        <div class="middle-left">
+      <div class="middle" @click="togglePage">
+        <div class="middle-left" v-show="!showLyric">
           <div class="middle-img">
             <div :class="[playing ? 'play' : 'play pause', 'img']">
               <img :src="currentSong.picUrl" />
             </div>
           </div>
-          <div class="lyri-wrapper">歌词</div>
+          <div class="lyri-wrapper">{{ playLyric }}</div>
         </div>
-        <div class="middle-right"></div>
+        <scroll
+          ref="lyricScroll"
+          class="middle-right scroll-container"
+          :data="lyrs"
+          v-show="showLyric"
+        >
+          <ul>
+            <li
+              ref="scroll"
+              :class="[
+                currentLyricIndex === index ? 'hightLightFont' : 'normal',
+                lyrs.length === 1 ? 'lyrsHeight' : '',
+              ]"
+              v-for="(item, index) in lyrs"
+              :key="index"
+            >
+              {{ item.lyr }}
+            </li>
+          </ul>
+        </scroll>
       </div>
       <div class="bottom">
-        <div class="dots">
+        <!-- <div class="dots">
           <span class="dot"></span>
           <span class="dot"></span>
           <span class="dot"></span>
-        </div>
+        </div> -->
         <div class="progress-wrapper">
           <div class="time-left">{{ formateTime }}</div>
           <div class="progress">
-            <Progress :percent="percent" @trggleProgress="trggleProgress"/>
+            <Progress :percent="percent" @toggleProgress="toggleProgress" />
           </div>
           <div class="time-right">{{ formateDuration }}</div>
         </div>
         <div class="operators">
           <div>
-            <i class="iconfont icon-suijibofang"></i>
+            <i @click="togglePlayMode" :class="['iconfont', iconMode]"></i>
           </div>
           <div>
             <i @click="prevHandler" class="iconfont icon-48shangyishou"></i>
@@ -68,10 +87,12 @@
         <div class="common author">{{ currentSong.singer }}</div>
       </div>
       <div class="mini-control">
-        <i
-          @click.stop="togglePlay"
-          :class="['iconfont', playing ? 'icon-zanting' : 'icon-bofang']"
-        ></i>
+        <progress-circle :percent="percent">
+          <i
+            @click.stop="togglePlay"
+            :class="['iconfont', playing ? 'icon-zanting' : 'icon-bofang', 'icon-mini']"
+          ></i>
+        </progress-circle>
       </div>
       <div class="mini-control">
         <i class="iconfont icon-bofangliebiao"></i>
@@ -90,22 +111,42 @@
 
 <script>
 import { mapGetters, mapMutations } from "vuex";
-import { getTime } from "@/utils/utils";
+import { getTime, shuffle, getTimeFormate } from "@/utils/utils";
+import { playMode } from "@/common/playerConfig";
+import { getLyric } from "@/api/player";
 
+import Scroll from "@/components/Scroll/index";
 import Progress from "../progress/index";
+import progressCircle from "../progressCircle/index";
 
 export default {
   components: {
+    Scroll,
     Progress,
+    progressCircle,
   },
   data() {
     return {
       songReady: false,
       duration: "",
       currentTime: "",
+      lyrs: [],
+      LyricTop: [],
+      currentLyricIndex: 0,
+      showLyric: false,
+      playLyric: "",
     };
   },
   computed: {
+    ...mapGetters([
+      "fullScreen",
+      "playList",
+      "currentSong",
+      "playing",
+      "currentIndex",
+      "mode",
+      "sequenceList",
+    ]),
     formateTime() {
       return getTime(this.currentTime);
     },
@@ -115,13 +156,24 @@ export default {
     percent() {
       return this.currentTime / this.duration;
     },
-    ...mapGetters(["fullScreen", "playList", "currentSong", "playing", "currentIndex"]),
+    iconMode() {
+      return this.mode === playMode.sequence
+        ? "icon-liebiaoxunhuan"
+        : this.mode === playMode.loop
+        ? "icon-danquxunhuan"
+        : "icon-suijibofang";
+    },
   },
   watch: {
-    currentSong() {
+    currentSong(newValue, oldValue) {
+      if (newValue.id === oldValue.id) {
+        return;
+      }
       this.$nextTick(() => {
+        this.$refs.lyricScroll.scrollTop = 0;
         const audio = this.$refs.audio;
         audio.play();
+        this._getLyric();
       });
     },
     playing(newValue) {
@@ -132,17 +184,44 @@ export default {
     },
   },
   methods: {
+    ...mapMutations({
+      setFullScreen: "SET_FULL_SCREEN",
+      setPlayingState: "SET_PLAYING_STATE",
+      setCurrentIndex: "SET_CURRENTINDEX",
+      setPlayMode: "SET_PLAY_MODE",
+      setPlayList: "SET_PLAYLIST",
+    }),
     backHandler() {
       this.setFullScreen(false);
     },
     openPlayer() {
       this.setFullScreen(true);
     },
+    // 播放方式切换
+    togglePlayMode() {
+      const currentMode = (this.mode + 1) % 3;
+      this.setPlayMode(currentMode);
+      let list = null;
+      // 若是随机播放方式，则对顺序列表进行打乱
+      if (currentMode === playMode.random) {
+        list = shuffle(this.sequenceList);
+      } else {
+        list = this.sequenceList;
+      }
+      this.resetCurrentIndex(list);
+      this.setPlayList(list);
+    },
+    // 歌曲列表修改时，其索引值也需改变
+    resetCurrentIndex(list) {
+      let index = list.findIndex((item) => {
+        return item.id === this.currentSong.id;
+      });
+      this.setCurrentIndex(index);
+    },
     // 上一首
     prevHandler() {
-      if (!this.songReady) {
-        return;
-      }
+      if (!this.songReady) return;
+      this.$refs.audio.currentTime = 0;
       let index = this.currentIndex - 1;
       if (index === -1) {
         index = this.playList.length - 1;
@@ -159,9 +238,8 @@ export default {
     },
     // 下一首
     nextHandler() {
-      if (!this.songReady) {
-        return;
-      }
+      if (!this.songReady) return;
+      this.$refs.audio.currentTime = 0;
       let index = this.currentIndex + 1;
       if (index === this.playList.length) {
         index = 0;
@@ -180,30 +258,85 @@ export default {
     // 当音频发生错误时
     error() {
       console.log("无法播放");
-      console.log("error");
       this.songReady = true;
-      
     },
     // 获取当前时间
     timeupdate(e) {
       this.currentTime = e.target.currentTime;
+      this.getCurrentLyrsIndex();
+    },
+    getCurrentLyrsIndex() {
+      const index = this.lyrs.findIndex((item, index) => {
+        if (index < this.lyrs.length - 1) {
+          return (
+            item.time <= this.currentTime && this.lyrs[index + 1].time > this.currentTime
+          );
+        } else {
+          return true;
+        }
+      });
+      this.currentLyricIndex = index;
+      this.scrollTo(index);
+      this.playLyric = this.lyrs[index].lyr;
     },
     // 音频结束
     ended() {
-      this.nextHandler();
+      if (this.mode === playMode.loop) {
+        this.loop();
+      } else {
+        this.nextHandler();
+      }
+    },
+    loop() {
+      this.$refs.audio.currentTime = 0;
+      this.$refs.audio.play();
     },
     // 进度条
-    trggleProgress(percent){
+    toggleProgress(percent) {
       this.$refs.audio.currentTime = percent * this.duration;
       if (!this.playing) {
         this.togglePlay();
       }
     },
-    ...mapMutations({
-      setFullScreen: "SET_FULL_SCREEN",
-      setPlayingState: "SET_PLAYING_STATE",
-      setCurrentIndex: "SET_CURRENTINDEX",
-    }),
+    // 获取歌词
+    async _getLyric() {
+      const { id } = this.currentSong;
+      const params = { id };
+      const res = await getLyric(params);
+      console.log("res", res);
+      if (res.code === 200) {
+        let reg = /\[(.*)\](.*)\n/gim;
+        let result;
+        this.lyrs = [];
+        if (res?.lrc?.lyric) {
+          while ((result = reg.exec(res.lrc.lyric))) {
+            this.lyrs.push({ time: getTimeFormate(result[1]), lyr: result[2].trim() });
+          }
+        } else {
+          this.lyrs.push({ time: 0, lyr: "此歌曲为没有填词的纯音乐，请您欣赏" });
+        }
+        this.$nextTick(() => {
+          this.LyricTop = Array.from(this.$refs.scroll);
+        });
+      }
+    },
+    scrollTo(index) {
+      const length = this.lyrs.length - 5;
+      if (index < 5) {
+        this.$refs.lyricScroll.scrollTo(0, 0);
+      } else if (index >= length) {
+        this.$refs.lyricScroll.scrollToElement(this.LyricTop[index], 1000);
+      } else {
+        this.$refs.lyricScroll.scrollToElement(this.LyricTop[index - 5], 1000);
+      }
+    },
+    togglePage() {
+      this.showLyric = !this.showLyric;
+      this.$nextTick(()=>{
+        this.$refs.lyricScroll.refresh()
+      })
+      this.getCurrentLyrsIndex();
+    },
   },
 };
 </script>
@@ -263,6 +396,7 @@ export default {
   }
 }
 .middle {
+  position: relative;
   width: 100%;
   height: 66%;
   text-align: center;
@@ -284,6 +418,25 @@ export default {
     .lyri-wrapper {
       margin-top: 20px;
       color: #fff;
+    }
+  }
+  .middle-right {
+    position: fixed;
+    top: 90px;
+    bottom: 23%;
+    width: 100%;
+    overflow: hidden;
+    .hightLightFont {
+      color: #fff;
+      line-height: 32px;
+    }
+    .normal {
+      color: #fff;
+      opacity: 0.5;
+      line-height: 32px;
+    }
+    .lyrsHeight {
+      padding-top: 50%;
     }
   }
 }
@@ -353,7 +506,6 @@ export default {
   padding: 0 10px;
   height: 60px;
   background: #333;
-  border: 1px solid #fff;
   .mini-img {
     width: 45px;
     height: 45px;
@@ -385,11 +537,12 @@ export default {
     font-size: 30px;
     color: #ffcd32;
     padding: 0 5px;
+    opacity: 0.5;
   }
 }
 
 .play {
-  animation: rotate 10s linear infinite;
+  animation: rotate 20s linear infinite;
 }
 .pause {
   animation-play-state: paused;
