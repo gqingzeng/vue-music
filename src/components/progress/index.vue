@@ -43,7 +43,6 @@ export default {
       this.touchData.progressWidth = this.$refs.progress.clientWidth;
     },
     touchmove(e) {
-      console.log("bbb");
       const progressContainerWidth = this.$refs.progressContainer.clientWidth;
       // 触摸时移动的距离
       const delX = e.touches[0].pageX - this.touchData.offsetStartX;
@@ -54,17 +53,16 @@ export default {
     },
     touchend() {
       this.touchData.initated = false;
-      this.trggleProgress();
+      this.toggleProgress();
     },
-    trggleProgress() {
-      const width = this.$refs.progressContainer.clientWidth;
-      const percent = this.$refs.progress.clientWidth / width;
-      this.$emit("trggleProgress", percent);
+    toggleProgress() {
+      const totalWidth = this.$refs.progressContainer.clientWidth;
+      const percent = this.$refs.progress.clientWidth / totalWidth;
+      this.$emit("toggleProgress", percent);
     },
     progressClick(e) {
-      console.log(e.offsetX);
       this.setStyle(e.offsetX);
-      this.trggleProgress();
+      this.toggleProgress();
     },
     setStyle(offsetWidth) {
       this.$refs.progress.style.width = `${offsetWidth}px`;
