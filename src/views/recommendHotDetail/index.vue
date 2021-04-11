@@ -34,7 +34,6 @@ export default {
     },
     handleData(musicList) {
       return musicList.map((item) => {
-        console.log(item);
         const { id, name: songName, ar } = item;
         const url = getSongUrl(id);
         const singer = item.ar[0].name;
