@@ -35,7 +35,6 @@ export default {
   },
   methods: {
     touchstart(e) {
-      console.log("aaaa");
       this.touchData.initated = true;
       // 开始触摸时距左侧的偏移距离
       this.touchData.offsetStartX = e.touches[0].pageX;
