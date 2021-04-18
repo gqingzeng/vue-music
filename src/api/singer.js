@@ -17,3 +17,11 @@ export function getArtists(params){
     params,
   })
 }
+
+export function getSong(params){
+  return request({
+    url:"/song/detail",
+    params,
+    method:'get',
+  })
+}
