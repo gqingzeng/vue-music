@@ -41,11 +41,6 @@
         </scroll>
       </div>
       <div class="bottom">
-        <!-- <div class="dots">
-          <span class="dot"></span>
-          <span class="dot"></span>
-          <span class="dot"></span>
-        </div> -->
         <div class="progress-wrapper">
           <div class="time-left">{{ formateTime }}</div>
           <div class="progress">
@@ -70,7 +65,10 @@
             <i @click="nextHandler" class="iconfont icon-49xiayishou"></i>
           </div>
           <div>
-            <i class="iconfont icon-shoucang"></i>
+            <i
+              @click="favoriteHandler(currentSong)"
+              :class="['iconfont', getFavoriteClass(currentSong)]"
+            ></i>
           </div>
         </div>
       </div>
@@ -94,10 +92,19 @@
           ></i>
         </progress-circle>
       </div>
-      <div class="mini-control">
+      <div class="mini-control" @click.stop="miniPlayListBtn">
         <i class="iconfont icon-bofangliebiao"></i>
       </div>
     </div>
+    <miniPlayList
+      v-if="showDialog"
+      :list="sequenceList"
+      @toggleMiniPlayMode="togglePlayMode"
+      @closeDialog="closeDialog"
+      @delAll="delAll"
+      @deleteSong="deleteMiniSong"
+      @selectMiniItem="selectMiniItem"
+    ></miniPlayList>
     <audio
       ref="audio"
       :src="currentSong.url"
@@ -110,7 +117,7 @@
 </template>
 
 <script>
-import { mapGetters, mapMutations } from "vuex";
+import { mapGetters, mapMutations, mapActions } from "vuex";
 import { getTime, shuffle, getTimeFormate } from "@/utils/utils";
 import { playMode } from "@/common/playerConfig";
 import { getLyric } from "@/api/player";
@@ -118,12 +125,14 @@ import { getLyric } from "@/api/player";
 import Scroll from "@/components/Scroll/index";
 import Progress from "../progress/index";
 import progressCircle from "../progressCircle/index";
+import miniPlayList from "../miniPlayList/index";
 
 export default {
   components: {
     Scroll,
     Progress,
     progressCircle,
+    miniPlayList,
   },
   data() {
     return {
@@ -135,6 +144,8 @@ export default {
       currentLyricIndex: 0,
       showLyric: false,
       playLyric: "",
+      showDialog: false,
+      saveLyricIndex: 0,
     };
   },
   computed: {
@@ -146,6 +157,7 @@ export default {
       "currentIndex",
       "mode",
       "sequenceList",
+      "favoriteList",
     ]),
     formateTime() {
       return getTime(this.currentTime);
@@ -166,7 +178,7 @@ export default {
   },
   watch: {
     currentSong(newValue, oldValue) {
-      if (newValue.id === oldValue.id) {
+      if (newValue.id === oldValue.id || this.playList.length === 0) {
         return;
       }
       this.$nextTick(() => {
@@ -190,7 +202,10 @@ export default {
       setCurrentIndex: "SET_CURRENTINDEX",
       setPlayMode: "SET_PLAY_MODE",
       setPlayList: "SET_PLAYLIST",
+      setFavorite: "SET_FAVORITELIST",
+      deleteFavorite: "DEL_FAVORITELIST",
     }),
+    ...mapActions(["deleteSong", "deleteAllSong"]),
     backHandler() {
       this.setFullScreen(false);
     },
@@ -250,6 +265,26 @@ export default {
       }
       this.songReady = false;
     },
+    favoriteHandler(song) {
+      const flag = this.isFavorite(song);
+      if (flag) {
+        this.deleteFavorite(song);
+      } else {
+        this.setFavorite(song);
+      }
+    },
+    getFavoriteClass(song) {
+      const flag = this.isFavorite(song);
+      if (flag) {
+        return "icon-yishoucang";
+      } else {
+        return "icon-shoucang";
+      }
+    },
+    isFavorite(song) {
+      const index = this.favoriteList.findIndex((item) => item.id === song.id);
+      return index > -1;
+    },
     // 当音频可以播放时
     canplay() {
       this.songReady = true;
@@ -275,7 +310,11 @@ export default {
           return true;
         }
       });
-      this.currentLyricIndex = index;
+      console.log("index", index);
+      if (this.saveLyricIndex === index) {
+        return;
+      }
+      this.saveLyricIndex = this.currentLyricIndex = index;
       this.scrollTo(index);
       this.playLyric = this.lyrs[index].lyr;
     },
@@ -326,15 +365,42 @@ export default {
       } else if (index >= length) {
         this.$refs.lyricScroll.scrollToElement(this.LyricTop[index], 1000);
       } else {
-        this.$refs.lyricScroll.scrollToElement(this.LyricTop[index - 5], 1000);
+        let newIndex = index - 7;
+        if (newIndex < 0) {
+          newIndex = 0;
+        }
+        this.$refs.lyricScroll.scrollToElement(this.LyricTop[newIndex], 1000);
       }
     },
     togglePage() {
       this.showLyric = !this.showLyric;
-      this.$nextTick(()=>{
-        this.$refs.lyricScroll.refresh()
-      })
+      this.$nextTick(() => {
+        this.$refs.lyricScroll.refresh();
+      });
       this.getCurrentLyrsIndex();
+    },
+    closeDialog() {
+      this.showDialog = false;
+    },
+    miniPlayListBtn() {
+      this.showDialog = true;
+    },
+    deleteMiniSong(item) {
+      this.deleteSong(item);
+      if (this.playList.length === 0) {
+        this.showDialog = false;
+      }
+    },
+    delAll() {
+      this.deleteAllSong();
+      this.showDialog = false;
+    },
+    selectMiniItem(item, index) {
+      if (this.mode === playMode.random) {
+        index = this.playList.findIndex((song) => song.id === item.id);
+      }
+      this.setCurrentIndex(index);
+      this.setPlayingState(true);
     },
   },
 };
@@ -401,6 +467,8 @@ export default {
   text-align: center;
   .middle-left {
     margin: 0 auto;
+    opacity: 1;
+    transition: all 0.5s;
     .img {
       box-sizing: border-box;
       width: 265px;
@@ -422,7 +490,7 @@ export default {
   .middle-right {
     position: fixed;
     top: 90px;
-    bottom: 23%;
+    bottom: 24%;
     width: 100%;
     overflow: hidden;
     .hightLightFont {
@@ -478,20 +546,8 @@ export default {
   .icon-bofang {
     font-size: 40px;
   }
-}
-.dots {
-  text-align: center;
-  .dot {
-    display: inline-block;
-    width: 8px;
-    height: 8px;
-    margin: 0 10px 10px 10px;
-    border-radius: 50%;
-    margin-right: 3px;
-    background: rgba(238, 238, 238, 0.5);
-    &.active {
-      background: rgba(255, 255, 255, 1);
-    }
+  .icon-yishoucang {
+    color: red;
   }
 }
 
