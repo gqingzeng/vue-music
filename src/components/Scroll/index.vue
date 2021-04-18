@@ -8,7 +8,7 @@
 import Bscroll from "@better-scroll/core";
 
 export default {
-  name:"Scroll",
+  name: "Scroll",
   props: {
     probeType: {
       type: Number,
@@ -22,13 +22,17 @@ export default {
       type: Boolean,
       default: false,
     },
+    pullup: {
+      type: Boolean,
+      default: false,
+    },
     data: {
       type: Array,
     },
   },
   data() {
     return {
-      scroll:null
+      scroll: null,
     };
   },
   watch: {
@@ -59,6 +63,13 @@ export default {
           _this.$emit("scroll", pos);
         });
       }
+      if(this.pullup){
+        this.scroll.on("scrollEnd", () => {
+          if(this.scroll.y < this.scroll.maxScrollY + 50){
+            this.$emit("scrollToEnd");
+          }
+        });
+      }
     },
     disable() {
       this.scroll.disable();
@@ -69,15 +80,14 @@ export default {
     refresh() {
       this.scroll.refresh();
     },
-    scrollTo(...arg){
-      this.scroll.scrollTo(...arg)
+    scrollTo(...arg) {
+      this.scroll.scrollTo(...arg);
     },
-    scrollToElement(...arg){
-      this.scroll.scrollToElement(...arg)
-    }
+    scrollToElement(...arg) {
+      this.scroll.scrollToElement(...arg);
+    },
   },
 };
 </script>
 
-<style scoped lang="scss">
-</style>
+<style scoped lang="scss"></style>
