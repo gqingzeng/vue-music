@@ -3,121 +3,183 @@
     <div class="search-container">
       <i class="iconfont icon-sousuo"></i>
       <input type="text" placeholder="搜索歌曲、歌手" v-model="searchValue" />
-      <i
-        class="iconfont icon-shanchu"
-        v-show="searchValue"
-        @click="delSearchValueHandler"
-      ></i>
+      <i class="iconfont icon-shanchu" v-show="searchValue" @click="clearInput"></i>
     </div>
-    <scroll ref="scroll" class="shortcut-wrapper" :data="searchList">
-      <div>
-        <div class="hot-search-wrapper">
-          <h1 class="title">热门搜索</h1>
-          <ul>
-            <li class="item" v-for="(item, index) in searchList" :key="index">
-              <span @click="hotClickHandler(item)">{{ item.first }}</span>
-            </li>
-          </ul>
-        </div>
-        <div class="search-history-wrapper">
-          <div class="search-head" v-show="isShowHistory">
-            <span>搜索历史</span>
-            <i class="iconfont icon-shanchu1" @click="delAllHistoryHandler"></i>
-          </div>
-          <ul>
-            <li
-              class="search-list"
-              v-for="(historyItem, historyIndex) in historyList"
-              :key="historyIndex"
-            >
-              <span>{{ historyItem }}</span>
-              <i
-                class="iconfont icon-shanchu11"
-                @click="delHistoryItemHandler(historyIndex)"
-              ></i>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </scroll>
+    <SearchResult
+      v-if="!searchValue"
+      :searchList="searchList"
+      :historyList="searchHistoryList"
+      :isShowHistory="getShowHistory"
+      @hotClickHandler="hotClickHandler"
+      @delAllHistoryHandler="delAllHistoryHandler"
+      @delHistoryItemHandler="delHistoryItemHandler"
+      @selectSearchHistory="selectSearchHistory"
+    ></SearchResult>
+    <SuggestList
+      v-else
+      :sugestList="sugestList"
+      :title="title"
+      :showNoResult="showNoResult"
+      :showLoadImg="showLoadImg"
+      @suggestItem="suggestItem"
+      @scrollToEnd="scrollToEnd"
+    ></SuggestList>
   </div>
 </template>
 
 <script>
-import { getHotSearch } from "@/api/search";
-import { mapGetters } from "vuex";
-import { PlayListMixin } from "@/common/mixin";
+import { getHotSearch, searchQuery } from "@/api/search";
+import { getSong } from "@/api/singer";
+import { getSongUrl } from "@/api/player";
+import { debounce } from "@/utils/utils";
 
-import Scroll from "@/components/Scroll/index";
+import { mapGetters, mapActions, mapMutations } from "vuex";
+
+import SuggestList from "../components/SuggestList";
+import SearchResult from "./components/SearchResult";
 
 export default {
   name: "search",
-  mixins: [PlayListMixin],
+
   components: {
-    Scroll,
+    SuggestList,
+    SearchResult,
   },
   data() {
     return {
       searchValue: "",
       searchList: [],
-      historyList: [
-        "我们的歌",
-        "冰雪奇缘2",
-        "张杰",
-        "桥边姑娘",
-        "星辰大海",
-        "我们的歌",
-        "冰雪奇缘2",
-        "张杰",
-        "桥边姑娘",
-        "星辰大海",
-      ],
-      isShowHistory: true,
+      isShowHistory: false,
+      sugestList: [],
+      page: 1,
+      limit: 30,
+      hasMore: true,
+      title: "",
+      showLoadImg: true,
+      showNoResult: false,
     };
   },
   computed: {
-    ...mapGetters(["fullScreen"]),
+    ...mapGetters(["fullScreen", "searchHistoryList"]),
+    getShowHistory() {
+      if (this.searchHistoryList.length > 0) {
+        return true;
+      } else {
+        return false;
+      }
+    },
   },
   created() {
     this.getHotSearch();
   },
   watch: {
-    searchValue: function (newValue) {
-      console.log(newValue);
-    },
+    searchValue: debounce(function (newValue) {
+      this.page = 1;
+      this.title = "";
+      this.sugestList = [];
+      this.showLoadImg = true;
+      this.showNoResult = false;
+      if (newValue !== "") {
+        this.searchQuery();
+      }
+    }, 400),
   },
   methods: {
+    ...mapActions(["insetSong"]),
+    ...mapMutations({
+      setSearchHistory: "SET_SEARCHHISTORYLIST",
+      delSearchHistory: "DEL_SEARCHHISTORYLIST",
+      delAllSearchHistory: "DELALL_SEARCHHISTORYLIST",
+    }),
     // 热门搜索
     async getHotSearch() {
       const { code, result } = await getHotSearch();
       if (code === 200) {
+        console.log("result", result);
         this.searchList = result.hots;
       }
     },
     hotClickHandler(item) {
+      console.log("item", item);
       const { first } = item;
       this.searchValue = first;
     },
     // 输入框清空
-    delSearchValueHandler() {
+    clearInput() {
       this.searchValue = "";
     },
     delAllHistoryHandler() {
-      this.isShowHistory = false;
-      this.historyList = [];
+      this.delAllSearchHistory();
     },
     delHistoryItemHandler(index) {
-      const { historyList } = this;
-      historyList.splice(index, 1);
-      if (!historyList.length) {
-        this.isShowHistory = false;
+      this.delSearchHistory(index);
+      if (!this.searchHistoryList.length) {
         this.$refs.scroll.refresh();
       }
     },
-    handlePlayList(playList) {
-      const bottom = playList.length > 0 ? "60px" : "";
-      this.$refs.scroll.$el.style.bottom = bottom;
-      this.$refs.scroll.refresh();
+    selectSearchHistory(item){
+      this.searchValue = item;
+    },
+    // 搜索
+    async searchQuery() {
+      const { searchValue: keywords, page: offset, limit } = this;
+      const params = {
+        keywords,
+        offset,
+        limit,
+      };
+      console.log("params", params);
+      const { code, result } = await searchQuery(params);
+      console.log("code", code);
+      console.log("result", result);
+      this.page += limit;
+      if (code === 200) {
+        if (result?.hasMore === undefined) {
+          this.showLoadImg = false;
+          this.showNoResult = true;
+        } else {
+          this.hasMore = result.hasMore;
+          this.sugestList = this.sugestList.concat(result.songs);
+          if (!result.hasMore) {
+            this.showLoadImg = false;
+            this.title = "到底啦~";
+            return;
+          }
+        }
+      }
+    },
+    async suggestItem(item) {
+      console.log("item1", item);
+      const ids = item.id;
+      const params = { ids };
+      const { code, songs } = await getSong(params);
+      if (code === 200) {
+        const song = this.handleSong(songs);
+        console.log("song", song);
+        this.insetSong(song);
+      }
+      this.setSearchHistory(item.name);
+    },
+    handleSong(songs) {
+      const { id, name: songName, ar } = songs[0];
+      const url = getSongUrl(id);
+      const singer = songs[0].ar[0].name;
+      const { picUrl } = songs[0].al;
+      return {
+        id,
+        url,
+        songName,
+        singer,
+        picUrl,
+        fullName: `${songName}-${ar[0].name}`,
+      };
+    },
+    scrollToEnd() {
+      console.log(this.page);
+      if (this.searchValue !== "" && this.hasMore) {
+        console.log("aaaa");
+        this.searchQuery();
+      }
     },
   },
 };
@@ -145,50 +207,5 @@ export default {
     color: #fff;
     outline: none;
   }
-}
-.shortcut-wrapper {
-  position: fixed;
-  top: 178px;
-  bottom: 0;
-  width: 100%;
-  overflow: hidden;
-}
-.hot-search-wrapper {
-  margin: 0 20px 20px 20px;
-  .item {
-    display: inline-block;
-    padding: 3px 7px;
-    margin: 0 10px 10px 0;
-    border-radius: 6px;
-    background: #333;
-    color: rgba(255, 255, 255, 0.3);
-  }
-}
-.search-history-wrapper {
-  margin: 0 20px;
-  .search-head {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    height: 40px;
-    font-size: 12px;
-    color: rgba(255, 255, 255, 0.5);
-  }
-  .icon-shanchu1 {
-    font-size: 12px;
-  }
-  .search-list {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    height: 40px;
-    color: rgba(255, 255, 255, 0.5);
-  }
-}
-
-.title {
-  margin-bottom: 20px;
-  font-size: 12px;
-  color: rgba(255, 255, 255, 0.5);
 }
 </style>
