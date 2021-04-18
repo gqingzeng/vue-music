@@ -22,7 +22,6 @@ export function getRandom(min, max) {
 
 export function shuffle(array) {
   const newArray = [...array]
-  console.log("newArray",newArray);
   for (let index = 0; index < newArray.length; index++) {
     const randomNum = getRandom(0, index)
     const temp = newArray[index];
@@ -37,9 +36,21 @@ export function shuffle(array) {
  * @param {时间(00:00)} time 
  * @returns 多少秒(例200s)
  */
-export function getTimeFormate(time){
+export function getTimeFormate(time) {
   const index = time.indexOf(":");
   const min = time.substring(0, index);
   const seconds = time.substring(index + 1, time.length);
   return min * 60 + seconds * 1;
+}
+
+export function debounce(fn, delay) {
+  let time
+  return function (...arg) {
+    if (time) {
+      clearTimeout(time)
+    }
+    time = setTimeout(() => {
+      fn.apply(this, arg)
+    }, delay);
+  }
 }
