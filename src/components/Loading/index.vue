@@ -1,6 +1,6 @@
 <template>
   <div class="loading">
-    <img class="icon-loading" src="@/assets/img/loading/loading.gif" />
+    <img v-show="showLoadImg" class="icon-loading" src="@/assets/img/loading/loading.gif" />
     <p class="desc">{{title}}</p>
   </div>
 </template>
@@ -13,6 +13,10 @@ export default {
       type: String,
       default:"载入中..."
     },
+    showLoadImg:{
+      type:Boolean,
+      default:true
+    }
   },
   data() {
     return {};
