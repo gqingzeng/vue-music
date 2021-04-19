@@ -254,6 +254,10 @@ export default {
     // 下一首
     nextHandler() {
       if (!this.songReady) return;
+      if(this.playList.length === 1){
+        this.loop()
+        return
+      }
       this.$refs.audio.currentTime = 0;
       let index = this.currentIndex + 1;
       if (index === this.playList.length) {

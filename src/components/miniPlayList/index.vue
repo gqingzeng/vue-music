@@ -16,7 +16,10 @@
             >
               <i :class="['current', 'iconfont', getIcon(item)]"></i>
               <span class="text">{{ item.fullName }}</span>
-              <i class="iconfont icon-shoucang"></i>
+              <i
+                @click.stop="favoriteHandler(item)"
+                :class="['iconfont', getFavoriteClass(item)]"
+              ></i>
               <i @click.stop="deleteSong(item)" class="iconfont icon-shanchu11"></i>
             </li>
           </ul>
@@ -32,7 +35,7 @@
 <script>
 import Scroll from "@/components/Scroll/index";
 
-import { mapGetters } from "vuex";
+import { mapGetters, mapMutations } from "vuex";
 import { playMode } from "@/common/playerConfig";
 
 export default {
@@ -51,7 +54,7 @@ export default {
     return {};
   },
   computed: {
-    ...mapGetters(["mode", "currentSong"]),
+    ...mapGetters(["mode", "currentSong", "favoriteList"]),
     iconMode() {
       return this.mode === playMode.sequence
         ? "icon-liebiaoxunhuan"
@@ -70,6 +73,10 @@ export default {
     },
   },
   methods: {
+    ...mapMutations({
+      setFavorite: "SET_FAVORITELIST",
+      deleteFavorite: "DEL_FAVORITELIST",
+    }),
     getIcon(item) {
       if (this.currentSong.id === item.id) {
         return "icon-bofang";
@@ -88,9 +95,30 @@ export default {
     selectMiniItem(item, index) {
       this.$emit("selectMiniItem", item, index);
     },
-    deleteSong(item){
-      this.$emit('deleteSong',item)
-    }
+    deleteSong(item) {
+      this.$emit("deleteSong", item);
+    },
+    favoriteHandler(song) {
+      console.log("song",song);
+      const flag = this.isFavorite(song);
+      if (flag) {
+        this.deleteFavorite(song);
+      } else {
+        this.setFavorite(song);
+      }
+    },
+    getFavoriteClass(song) {
+      const flag = this.isFavorite(song);
+      if (flag) {
+        return "icon-yishoucang";
+      } else {
+        return "icon-shoucang";
+      }
+    },
+    isFavorite(song) {
+      const index = this.favoriteList.findIndex((item) => item.id === song.id);
+      return index > -1;
+    },
   },
 };
 </script>
@@ -153,8 +181,12 @@ export default {
         .icon-bofang {
           color: #ffcd32;
         }
-        .icon-shoucang {
+        .icon-shoucang,
+        .icon-yishoucang {
           margin-right: 15px;
+        }
+        .icon-yishoucang {
+          color: red;
         }
       }
     }
